@@ -1,0 +1,7 @@
+# Ignore mobile app directory during web deployment
+binqr-mobile/
+
+# Ignore mobile-specific files
+**/*.mobile.*
+**/react-native*
+**/@react-navigation* 
