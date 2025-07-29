@@ -4,6 +4,7 @@ import "./globals.css";
 import { AuthProvider } from "@/components/auth/auth-provider";
 import { AppLayout } from "@/components/app-layout";
 import { Toaster } from "@/components/ui/sonner";
+import { ConditionalLayout } from "@/components/conditional-layout";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -49,7 +50,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased h-full bg-background`}
       >
         <AuthProvider>
-          <AppLayout title="BinQR">{children}</AppLayout>
+          <ConditionalLayout>{children}</ConditionalLayout>
           <Toaster />
         </AuthProvider>
       </body>

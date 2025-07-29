@@ -19,7 +19,7 @@ import { Button } from "./ui/button";
 
 const navItems = [
   {
-    href: "/",
+    href: "/dashboard",
     label: "Home",
     icon: Home,
   },
@@ -54,10 +54,17 @@ export function Navigation() {
   const pathname = usePathname();
   const { isAuthenticated } = useAuth();
 
-  // Don't show navigation on auth pages or if not authenticated
+  // Don't show navigation on auth pages, marketing pages, or if not authenticated
   if (
     !isAuthenticated ||
-    ["/login", "/signup", "/forgot-password"].includes(pathname)
+    [
+      "/login",
+      "/signup",
+      "/forgot-password",
+      "/reset-password",
+      "/",
+      "/support",
+    ].includes(pathname)
   ) {
     return null;
   }
