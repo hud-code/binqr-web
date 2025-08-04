@@ -69,8 +69,6 @@ function SignUpPageContent() {
         </p>
       </div>
 
-
-
       {/* SignUp Form */}
       <SignUpForm
         redirectTo={redirectTo}
@@ -89,7 +87,8 @@ function SignUpPageContent() {
             <strong>Welcome to BinQR!</strong>
           </p>
           <p>
-            Join thousands of users organizing their storage with smart QR code labels.
+            Join thousands of users organizing their storage with smart QR code
+            labels.
           </p>
         </div>
       </div>

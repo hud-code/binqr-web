@@ -168,7 +168,7 @@ export function LoginForm({ onSuccess, redirectTo = "/" }: LoginFormProps) {
                 href="/signup"
                 className="text-blue-600 hover:text-blue-700 hover:underline font-medium"
               >
-                Sign up with invite code
+                Sign up
               </Link>
             </div>
           </div>
