@@ -10,9 +10,14 @@ CREATE POLICY "Allow anon to use invite codes during signup" ON public.invites
   FOR UPDATE TO anon
   USING (status = 'pending' AND expires_at > timezone('utc'::text, now()));
 
--- 3. Allow anonymous users to insert into profiles during signup  
+-- 3. Allow anonymous users to insert and update profiles during signup  
 CREATE POLICY "Allow anon to create profiles during signup" ON public.profiles
   FOR INSERT TO anon
+  WITH CHECK (true);
+
+CREATE POLICY "Allow anon to update profiles during signup" ON public.profiles
+  FOR UPDATE TO anon
+  USING (true)
   WITH CHECK (true);
 
 -- 4. Check current invite status
