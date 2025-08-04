@@ -82,7 +82,6 @@ export interface SignUpData {
   email: string;
   password: string;
   full_name?: string;
-  invite_code: string;
 }
 
 export interface SignInData {
@@ -108,7 +107,6 @@ export interface SignUpFormData {
   password: string;
   confirmPassword: string;
   fullName: string;
-  inviteCode: string;
 }
 
 export interface SignInFormData {

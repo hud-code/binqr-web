@@ -2,21 +2,12 @@ import { supabase } from './supabase';
 import type { 
   SignUpData, 
   SignInData, 
-  Profile, 
-  Invite, 
-  InviteValidationResponse, 
-  CreateInviteResponse 
+  Profile 
 } from './types';
 
 // Authentication functions
 export const signUp = async (userData: SignUpData) => {
   try {
-    // First validate the invite code
-    const isValidInvite = await validateInviteCode(userData.invite_code);
-    if (!isValidInvite.valid) {
-      throw new Error(isValidInvite.message || 'Invalid invite code');
-    }
-
     // Create the user account
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email: userData.email,
@@ -24,26 +15,11 @@ export const signUp = async (userData: SignUpData) => {
       options: {
         data: {
           full_name: userData.full_name,
-          invite_code: userData.invite_code,
         },
       },
     });
 
     if (authError) throw authError;
-
-    // If user was created successfully, use the invite code
-    if (authData.user) {
-      const { data: result, error: useError } = await supabase.rpc('use_invite_code', {
-        invite_code: userData.invite_code,
-        user_id: authData.user.id,
-      });
-
-      if (useError || !result) {
-        // If invite code usage fails, sign out the user
-        await supabase.auth.signOut();
-        throw new Error('Failed to process invite code');
-      }
-    }
 
     return { data: authData, error: null };
   } catch (error) {

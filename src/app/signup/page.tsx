@@ -4,8 +4,7 @@ import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { SignUpForm } from "@/components/auth/signup-form";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Info, Users } from "lucide-react";
+
 import { getCurrentUser } from "@/lib/auth";
 
 function SignUpPageContent() {
@@ -13,7 +12,6 @@ function SignUpPageContent() {
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(true);
 
-  const inviteCode = searchParams.get("invite") || "";
   const redirectTo = searchParams.get("redirect") || "/";
 
   useEffect(() => {
@@ -71,33 +69,10 @@ function SignUpPageContent() {
         </p>
       </div>
 
-      {/* Invite-Only Notice */}
-      <div className="w-full max-w-md mb-6">
-        <Alert className="border-blue-200 bg-blue-50">
-          <Users className="h-4 w-4 text-blue-600" />
-          <AlertDescription className="text-blue-800">
-            <strong>Invite-Only Launch:</strong> BinQR is currently in private
-            beta. You need an invite code from an existing user to join.
-          </AlertDescription>
-        </Alert>
-      </div>
 
-      {/* Pre-filled invite code notice */}
-      {inviteCode && (
-        <div className="w-full max-w-md mb-6">
-          <Alert>
-            <Info className="h-4 w-4" />
-            <AlertDescription>
-              Great! Your invite code has been pre-filled. Complete the form
-              below to create your account.
-            </AlertDescription>
-          </Alert>
-        </div>
-      )}
 
       {/* SignUp Form */}
       <SignUpForm
-        initialInviteCode={inviteCode}
         redirectTo={redirectTo}
         onSuccess={() => {
           // Handle successful signup - redirect to login with message
@@ -111,11 +86,10 @@ function SignUpPageContent() {
       <div className="mt-6 w-full max-w-md">
         <div className="text-center text-sm text-gray-600 space-y-2">
           <p>
-            <strong>Don&apos;t have an invite code?</strong>
+            <strong>Welcome to BinQR!</strong>
           </p>
           <p>
-            Ask a friend who&apos;s already using BinQR to send you one, or
-            contact us to join the waitlist.
+            Join thousands of users organizing their storage with smart QR code labels.
           </p>
         </div>
       </div>

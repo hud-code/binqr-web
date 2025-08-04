@@ -16,19 +16,17 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Eye, EyeOff, UserPlus, AlertCircle, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
-import { signUp, validateInviteCode } from "@/lib/auth";
+import { signUp } from "@/lib/auth";
 import type { SignUpFormData } from "@/lib/types";
 
 interface SignUpFormProps {
   onSuccess?: () => void;
   redirectTo?: string;
-  initialInviteCode?: string;
 }
 
 export function SignUpForm({
   onSuccess,
   redirectTo = "/",
-  initialInviteCode = "",
 }: SignUpFormProps) {
   // redirectTo is available for future use
   console.log("SignUpForm redirectTo:", redirectTo);
@@ -38,45 +36,11 @@ export function SignUpForm({
     password: "",
     confirmPassword: "",
     fullName: "",
-    inviteCode: initialInviteCode,
   });
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [inviteValidation, setInviteValidation] = useState<{
-    isValidating: boolean;
-    isValid: boolean | null;
-    message: string;
-  }>({
-    isValidating: false,
-    isValid: null,
-    message: "",
-  });
-
-  const validateInvite = async (code: string) => {
-    if (!code.trim()) {
-      setInviteValidation({ isValidating: false, isValid: null, message: "" });
-      return;
-    }
-
-    setInviteValidation({ isValidating: true, isValid: null, message: "" });
-
-    try {
-      const result = await validateInviteCode(code);
-      setInviteValidation({
-        isValidating: false,
-        isValid: result.valid,
-        message: result.message || "",
-      });
-    } catch {
-      setInviteValidation({
-        isValidating: false,
-        isValid: false,
-        message: "Error validating invite code",
-      });
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,8 +52,7 @@ export function SignUpForm({
       if (
         !formData.email ||
         !formData.password ||
-        !formData.confirmPassword ||
-        !formData.inviteCode
+        !formData.confirmPassword
       ) {
         throw new Error("Please fill in all required fields");
       }
@@ -106,15 +69,10 @@ export function SignUpForm({
         throw new Error("Passwords do not match");
       }
 
-      if (inviteValidation.isValid !== true) {
-        throw new Error("Please enter a valid invite code");
-      }
-
       const { data, error: signUpError } = await signUp({
         email: formData.email,
         password: formData.password,
         full_name: formData.fullName,
-        invite_code: formData.inviteCode,
       });
 
       if (signUpError || !data?.user) {
@@ -151,12 +109,6 @@ export function SignUpForm({
       setFormData((prev) => ({ ...prev, [field]: value }));
 
       if (error) setError(null); // Clear error when user starts typing
-
-      // Validate invite code when it changes
-      if (field === "inviteCode") {
-        const debounceTimer = setTimeout(() => validateInvite(value), 500);
-        return () => clearTimeout(debounceTimer);
-      }
     };
 
   return (
@@ -164,7 +116,7 @@ export function SignUpForm({
       <CardHeader className="text-center">
         <CardTitle className="text-2xl font-bold">Join BinQR</CardTitle>
         <CardDescription>
-          Create your account with an invite code
+          Create your free account to get started
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -176,45 +128,7 @@ export function SignUpForm({
             </Alert>
           )}
 
-          <div className="space-y-2">
-            <Label htmlFor="inviteCode">
-              Invite Code <span className="text-red-500">*</span>
-            </Label>
-            <div className="relative">
-              <Input
-                id="inviteCode"
-                type="text"
-                placeholder="Enter your invite code"
-                value={formData.inviteCode}
-                onChange={handleChange("inviteCode")}
-                disabled={isLoading}
-                className="pr-10"
-                maxLength={8}
-              />
-              <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                {inviteValidation.isValidating && (
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                )}
-                {!inviteValidation.isValidating &&
-                  inviteValidation.isValid === true && (
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                  )}
-                {!inviteValidation.isValidating &&
-                  inviteValidation.isValid === false && (
-                    <AlertCircle className="h-4 w-4 text-red-600" />
-                  )}
-              </div>
-            </div>
-            {inviteValidation.message && (
-              <p
-                className={`text-xs ${
-                  inviteValidation.isValid ? "text-green-600" : "text-red-600"
-                }`}
-              >
-                {inviteValidation.message}
-              </p>
-            )}
-          </div>
+
 
           <div className="space-y-2">
             <Label htmlFor="fullName">Full Name</Label>
