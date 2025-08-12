@@ -87,7 +87,7 @@ export default function SupportPage() {
               Contact Support
             </h1>
             <p className="text-lg text-gray-600">
-              Need help? We're here to assist you with any questions or issues.
+              Need help? We&#39;re here to assist you with any questions or issues.
             </p>
           </div>
         </div>

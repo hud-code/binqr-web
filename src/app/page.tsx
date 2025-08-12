@@ -164,7 +164,7 @@ export default function LandingPage() {
               Why Choose BinQR?
             </h2>
             <p className="text-lg text-gray-600">
-              Join thousands of users who've revolutionized their storage
+              Join thousands of users who&#39;ve revolutionized their storage
               management.
             </p>
           </div>

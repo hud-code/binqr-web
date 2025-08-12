@@ -1,5 +1,17 @@
 "use client";
 
+/**
+ * CreateBox
+ *
+ * Three-step guided flow to create a new storage box:
+ * 1) Capture a photo for future AI analysis and easier identification
+ * 2) Collect core details (name, location, optional description)
+ * 3) Persist the box and present a scannable QR code
+ *
+ * Why: This wizard reduces friction by enforcing the minimal inputs and
+ * producing a QR code that uniquely identifies each box for later lookup.
+ */
+
 import { useState, useRef, useCallback, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,14 +35,23 @@ import { saveBox, getStoredLocations } from "@/lib/database";
 import { QRCodeDisplay } from "@/components/qr-code";
 
 export default function CreateBox() {
+  // Wizard step drives which card is rendered (photo → details → review)
   const [step, setStep] = useState<"photo" | "details" | "review">("photo");
+
+  // Base64 data URL for the selected photo so it can be previewed and stored
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
+
+  // User-provided metadata required to create a box
   const [boxDetails, setBoxDetails] = useState({
     name: "",
     description: "",
     locationId: "",
   });
+  
+  // QR content to encode and display once the box is persisted
   const [generatedQR, setGeneratedQR] = useState<string>("");
+
+  // Busy-state used while simulating AI work and saving
   const [isProcessing, setIsProcessing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -40,6 +61,7 @@ export default function CreateBox() {
   >([]);
 
   useEffect(() => {
+    // Load saved storage locations once to populate the Select options
     const loadLocations = async () => {
       const storedLocations = await getStoredLocations();
       setLocations(
@@ -50,6 +72,7 @@ export default function CreateBox() {
   }, []);
 
   const handleImageCapture = useCallback(
+    // Convert the chosen file into a base64 data URL for previewing in the UI
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0];
       if (file) {
@@ -63,15 +86,18 @@ export default function CreateBox() {
     []
   );
 
+  // Programmatically trigger the hidden file input to open the camera/gallery
   const openCamera = () => {
     fileInputRef.current?.click();
   };
 
+  // Clear captured photo and return to the first step
   const retakePhoto = () => {
     setCapturedImage(null);
     setStep("photo");
   };
 
+  // Enforce capturing a photo before proceeding so AI/context has input
   const proceedToDetails = () => {
     if (!capturedImage) {
       toast.error("Please take a photo first");
@@ -91,10 +117,10 @@ export default function CreateBox() {
     setIsProcessing(true);
 
     try {
-      // Simulate AI processing
+      // Simulate AI processing to keep UX responsive while "analyzing" the photo
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      // Get current user
+      // Ensure the user is authenticated before associating ownership
       const { user } = await getCurrentUser();
       if (!user) {
         toast.error("Please sign in to create boxes");
@@ -102,7 +128,7 @@ export default function CreateBox() {
         return;
       }
 
-      // Create the box object
+      // Assemble the persisted payload and generate a unique QR namespace
       const boxId = uuidv4();
       const qrData = `BinQR:${boxId}`;
       const now = new Date();
@@ -115,25 +141,28 @@ export default function CreateBox() {
         imageUrl: capturedImage || undefined,
         locationId: boxDetails.locationId,
         user_id: user.id,
-        contents: [], // Will be filled by AI or manual entry later
+        // Contents may be populated later by AI or manual entry
+        contents: [],
         aiAnalysis: "AI analysis pending...",
         createdAt: now,
         updatedAt: now,
       };
 
-      // Save to database
+      // Persist the new box and expose the QR for the review step
       await saveBox(newBox);
       setGeneratedQR(qrData);
 
       setStep("review");
       toast.success("Box created successfully!");
     } catch {
+      // Surface failure to the user without throwing to the console
       toast.error("Failed to create box");
     } finally {
       setIsProcessing(false);
     }
   };
 
+  // Reset local state so the user can immediately create another box
   const handleSaveBox = () => {
     toast.success("Box saved successfully!");
     // Reset form and go back to step 1
